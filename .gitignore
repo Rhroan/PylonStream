@@ -1,0 +1,23 @@
+## Visual Studio Build Outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## Visual Studio Cache and User Settings
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## MediaMTX/FFmpeg Temporary Binaries in execution
+bin/Debug/net8.0-windows/Binaries/ffmpeg.exe
+bin/Debug/net8.0-windows/Binaries/mediamtx.exe
+bin/Release/net8.0-windows/Binaries/ffmpeg.exe
+bin/Release/net8.0-windows/Binaries/mediamtx.exe
+
+## Project Specific Ignores
+planning/

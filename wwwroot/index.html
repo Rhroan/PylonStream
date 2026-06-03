@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pylon RTSP Streamer Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-brand"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
+                <span>Pylon Streamer</span>
+            </div>
+            <nav class="sidebar-menu">
+                <button class="menu-item active" onclick="switchTab('dashboard')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="menu-item" onclick="switchTab('settings')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Settings</span>
+                </button>
+                <button class="menu-item" onclick="switchTab('api-docs')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span>API Reference</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="version-label">v1.0.0 (Offline)</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Tab: Dashboard -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <div class="header-banner">
+                    <h1>System Dashboard</h1>
+                    <!-- Server Control Section -->
+                    <div class="server-control-card">
+                        <div class="status-info">
+                            <span class="status-label">MediaMTX Server:</span>
+                            <span id="mtx-status-badge" class="badge badge-warning">Stopped</span>
+                        </div>
+                        <div class="button-group">
+                            <button id="btn-start" class="btn btn-primary" onclick="triggerServiceControl('start')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="icon-btn-svg"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                Start Service
+                            </button>
+                            <button id="btn-stop" class="btn btn-danger" onclick="triggerServiceControl('stop')" disabled>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="icon-btn-svg"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                                Stop Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Left: Camera Grid & Logs -->
+                    <div class="dashboard-main">
+                        <div class="card card-table">
+                            <div class="card-header">
+                                <h2>Active Camera Streams</h2>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table" id="camera-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Camera IP</th>
+                                            <th>RTSP Stream URL</th>
+                                            <th>Encoder Config</th>
+                                            <th>FPS Target/Current</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="camera-tbody">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">No cameras loaded. Click Settings to configure.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Logs Console -->
+                        <div class="card card-logs">
+                            <div class="card-header">
+                                <h2>System Logs Console</h2>
+                                <button class="btn btn-secondary btn-sm" onclick="clearWebConsole()">Clear Console</button>
+                            </div>
+                            <div class="console-body" id="console-output">
+                                <!-- Logs pushed via SignalR will render here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: WebRTC Side Preview -->
+                    <aside class="dashboard-preview">
+                        <div class="card card-preview-inner">
+                            <div class="card-header">
+                                <h2>Live WHEP Preview</h2>
+                                <span id="previewing-camera-ip" class="badge badge-dark">None Selected</span>
+                            </div>
+                            <div class="video-container" id="video-preview-box">
+                                <div class="video-placeholder" id="video-placeholder-msg">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="icon-video-muted"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
+                                    <p>Select a camera row to play live stream</p>
+                                </div>
+                                <iframe id="webrtc-iframe" src="" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <div class="preview-footer">
+                                <p class="text-muted"><small>WebRTC preview uses MediaMTX WHEP server (Port 8889) for sub-second latency.</small></p>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- Tab: Settings -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="header-banner">
+                    <h1>Configuration Settings</h1>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Paths & Ports -->
+                    <div class="settings-card card">
+                        <div class="card-header">
+                            <h2>Global Server Paths</h2>
+                        </div>
+                        <div class="card-body form-layout">
+                            <div class="form-group">
+                                <label for="setting-ffmpeg">FFmpeg Executable Path:</label>
+                                <input type="text" id="setting-ffmpeg" class="form-control" placeholder="Binaries\ffmpeg.exe">
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-mediamtx">MediaMTX Executable Path:</label>
+                                <input type="text" id="setting-mediamtx" class="form-control" placeholder="Binaries\mediamtx.exe">
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-interface-ip">Bind Network Interface:</label>
+                                <select id="setting-interface-ip" class="form-control">
+                                    <option value="Auto">Auto (Default Socket Routing)</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="setting-rtsp-port">RTSP Port:</label>
+                                    <input type="number" id="setting-rtsp-port" class="form-control" value="8554">
+                                </div>
+                                <div class="form-group">
+                                    <label for="setting-web-port">Web API Port:</label>
+                                    <input type="number" id="setting-web-port" class="form-control" value="5000" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera Connection Config -->
+                    <div class="settings-card card card-table-settings">
+                        <div class="card-header">
+                            <h2>Camera IP & Stream Mappings</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="openCameraModal()">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-inline"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Camera
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="settings-camera-table">
+                                <thead>
+                                    <tr>
+                                        <th>IP Address</th>
+                                        <th>RTSP Path</th>
+                                        <th>Codec</th>
+                                        <th>Encoder Mode</th>
+                                        <th>Target FPS</th>
+                                        <th>Packet Size</th>
+                                        <th>IPD (ticks)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="settings-camera-tbody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-success" onclick="saveConfiguration()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-inline"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Configuration
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab: API Docs -->
+            <section id="tab-api-docs" class="tab-pane">
+                <div class="header-banner">
+                    <h1>API Reference & Integration Guide</h1>
+                </div>
+
+                <div class="card card-docs">
+                    <div class="card-body">
+                        <h2>REST API Endpoints</h2>
+                        <p>Other programs can query and control the streamer service by sending standard HTTP requests to the following REST API endpoints:</p>
+                        
+                        <div class="api-endpoint">
+                            <span class="method get">GET</span> <code class="url">/api/status</code>
+                            <p class="desc">Retrieves the running status of the server and all active camera streams (including resolutions, codecs, current FPS, and state).</p>
+                            <pre><code>{
+  "serverRunning": true,
+  "mediamtxRunning": true,
+  "mediamtxPort": 8554,
+  "cameras": [
+    {
+      "ipAddress": "192.168.1.101",
+      "streamName": "cam1",
+      "status": "Streaming",
+      "fps": 29.9,
+      "width": 1920,
+      "height": 1080,
+      "codec": "H264",
+      "encoder": "NVENC"
+    }
+  ]
+}</code></pre>
+                        </div>
+
+                        <div class="api-endpoint">
+                            <span class="method get">GET</span> <code class="url">/api/logs</code>
+                            <p class="desc">Retrieves the 200 most recent lines of console logs.</p>
+                        </div>
+
+                        <div class="api-endpoint">
+                            <span class="method post">POST</span> <code class="url">/api/control/start</code>
+                            <p class="desc">Starts the MediaMTX process and triggers Pylon grabbing for all configured cameras.</p>
+                        </div>
+
+                        <div class="api-endpoint">
+                            <span class="method post">POST</span> <code class="url">/api/control/stop</code>
+                            <p class="desc">Stops all camera capture loops and terminates the MediaMTX process cleanly.</p>
+                        </div>
+
+                        <div class="api-endpoint">
+                            <span class="method post">POST</span> <code class="url">/api/control/restart-camera?ip={camera_ip}</code>
+                            <p class="desc">Restarts only the specified camera's capture and streaming pipeline (fails with 404 if the IP is not in configuration).</p>
+                        </div>
+
+                        <div class="api-endpoint">
+                            <span class="method post">POST</span> <code class="url">/api/config</code>
+                            <p class="desc">Saves and updates the system configuration (`config.json`). Requires the new config object in the request body.</p>
+                        </div>
+
+                        <h2>Receiving Video Streams</h2>
+                        
+                        <h3>1. Standard RTSP stream (VLC, OpenCV, Python)</h3>
+                        <p>Connect using standard TCP transport layer. The format is:</p>
+                        <pre><code>rtsp://&lt;C#_Server_IP&gt;:8554/&lt;RTSP_Stream_Path&gt;</code></pre>
+                        <p><strong>Python OpenCV Sample:</strong></p>
+                        <pre><code>import cv2
+cap = cv2.VideoCapture("rtsp://192.168.1.50:8554/cam1")
+while cap.isOpened():
+    ret, frame = cap.read()
+    if ret:
+        cv2.imshow('Live Stream', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+
+                        <h3>2. WebRTC / WHEP stream (Ultra-low latency web player)</h3>
+                        <p>Retrieve live low-latency video via WHEP client-side negotiation:</p>
+                        <pre><code>http://&lt;C#_Server_IP&gt;:8889/&lt;RTSP_Stream_Path&gt;</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Camera Edit Modal Dialog -->
+    <div class="modal" id="camera-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New Camera</h3>
+                <button class="close-btn" onclick="closeCameraModal()">&times;</button>
+            </div>
+            <div class="modal-body form-layout">
+                <input type="hidden" id="edit-index" value="-1">
+                <div class="form-group">
+                    <label for="input-ip">Camera IP Address:</label>
+                    <input type="text" id="input-ip" class="form-control" placeholder="192.168.1.100">
+                </div>
+                <div class="form-group">
+                    <label for="input-stream">RTSP Stream Path:</label>
+                    <input type="text" id="input-stream" class="form-control" placeholder="cam1">
+                </div>
+                <div class="form-group">
+                    <label for="input-codec">Video Codec:</label>
+                    <select id="input-codec" class="form-control">
+                        <option value="H264">H.264 (Default)</option>
+                        <option value="H265">H.265 (HEVC)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-encoder">Encoder Mode:</label>
+                    <select id="input-encoder" class="form-control">
+                        <option value="CPU">CPU (Software - libx264/libx265)</option>
+                        <option value="NVENC">NVIDIA GPU (Hardware - h264_nvenc/hevc_nvenc)</option>
+                        <option value="QSV">Intel QuickSync (Hardware - h264_qsv/hevc_qsv)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-fps">Target FPS:</label>
+                    <input type="number" id="input-fps" class="form-control" value="30" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="input-packet-size">Packet Size (MTU):</label>
+                    <input type="number" id="input-packet-size" class="form-control" value="1500" min="576" max="9000">
+                </div>
+                <div class="form-group">
+                    <label for="input-packet-delay">Inter-Packet Delay:</label>
+                    <input type="number" id="input-packet-delay" class="form-control" value="1000" min="0" max="10000">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCameraModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCameraForm()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SignalR Script -->
+    <script src="js/signalr.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
